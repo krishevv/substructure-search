@@ -1,8 +1,8 @@
-from fastapi import UploadFile, HTTPException
+from fastapi import UploadFile, File, HTTPException
 from fastapi import FastAPI
 from pydantic import BaseModel
 from rdkit import Chem
-
+from os import getenv
 
 import json
 
