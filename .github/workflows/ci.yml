@@ -13,13 +13,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        
+      - name: Install Docker Compose
+        run: sudo apt-get update && sudo apt-get install -y docker-compose
+ 
       - name: Set up Docker Compose
         run: docker-compose version
 
       - name: Build and Start Docker Containers
         run: docker-compose up -d --build
 
+      
 
       - name: Wait for Services to Start
         run: sleep 10 # Даем контейнерам время запуститься
