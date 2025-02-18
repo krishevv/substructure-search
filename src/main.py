@@ -117,8 +117,8 @@ async def upload_file(file: UploadFile = File(...)):
                     detail="Каждый объект должен содержать поля 'id' и 'smiles'.")
             if molecule["id"] in molecule_store:
                 raise HTTPException(
-                    status_code=400, detail=f"Молекула с ID {
-                        molecule['id']} уже существует.")
+                    status_code=400, detail=f"Молекула с ID \
+                          {molecule['id']} уже существует.")
             molecule_store[molecule["id"]] = molecule["smiles"]
 
         return {"message": "Молекулы успешно загружены.", "count": len(data)}
