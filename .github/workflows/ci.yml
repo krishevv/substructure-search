@@ -38,6 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r src/requirements.txt
           pip install flake8 pytest
+          pip install httpx
 
       - name: Run Flake8 (Static Analysis)
         run: flake8 src --max-line-length=88
