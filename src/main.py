@@ -1,3 +1,4 @@
+from fastapi import UploadFile, File, HTTPException
 from fastapi import FastAPI, HTTPException, File
 from pydantic import BaseModel
 from rdkit import Chem
@@ -6,24 +7,24 @@ from os import getenv
 import json
 
 
-
-
 # Инициализация приложения FastAPI
 app = FastAPI()
 
 # Глобальное хранилище молекул
 molecule_store = {}
 
-# Модели данных 
+# Модели данных
+
 
 class Molecule(BaseModel):
     id: int
     smiles: str
 
+
 class SubstructureQuery(BaseModel):
     substructure: str
 
-# Эндпоинты 
+# Эндпоинты
 
 
 @app.get("/")
@@ -34,15 +35,18 @@ def get_server():
 @app.post("/add")
 def add_molecule(molecule: Molecule):
     if molecule.id in molecule_store:
-        raise HTTPException(status_code=400, detail="Молекула с таким ID уже существует.")
+        raise HTTPException(status_code=400,
+                            detail="Молекула с таким ID уже существует.")
     molecule_store[molecule.id] = molecule.smiles
     return {"message": "Молекула добавлена успешно.", "id": molecule.id}
+
 
 @app.get("/molecule/{id}")
 def get_molecule(id: int):
     if id not in molecule_store:
         raise HTTPException(status_code=404, detail="Молекула не найдена.")
     return {"id": id, "smiles": molecule_store[id]}
+
 
 @app.put("/molecule/{id}")
 def update_molecule(id: int, molecule: Molecule):
@@ -51,6 +55,7 @@ def update_molecule(id: int, molecule: Molecule):
     molecule_store[id] = molecule.smiles
     return {"message": "Молекула обновлена успешно.", "id": id}
 
+
 @app.delete("/molecule/{id}")
 def delete_molecule(id: int):
     if id not in molecule_store:
@@ -58,15 +63,19 @@ def delete_molecule(id: int):
     del molecule_store[id]
     return {"message": "Молекула удалена успешно.", "id": id}
 
+
 @app.get("/list")
 def list_molecules():
     return {"molecules": molecule_store}
+
 
 @app.post("/search")
 def search_substructure(query: SubstructureQuery):
     substructure = Chem.MolFromSmiles(query.substructure)
     if not substructure:
-        raise HTTPException(status_code=400, detail="Некорректная SMILES строка для подструктуры.")
+        raise HTTPException(
+            status_code=400,
+            detail="Некорректная SMILES строка для подструктуры.")
 
     matching_molecules = []
     for id, smiles in molecule_store.items():
@@ -76,8 +85,6 @@ def search_substructure(query: SubstructureQuery):
 
     return {"matches": matching_molecules}
 
-from fastapi import UploadFile, File, HTTPException
-import json
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -89,7 +96,8 @@ async def upload_file(file: UploadFile = File(...)):
     try:
         # Проверяем, что это JSON-файл
         if file.content_type != "application/json":
-            raise HTTPException(status_code=400, detail="Только JSON-файлы поддерживаются.")
+            raise HTTPException(status_code=400,
+                                detail="Только JSON-файлы поддерживаются.")
 
         # Читаем содержимое файла
         file_content = await file.read()
@@ -97,21 +105,25 @@ async def upload_file(file: UploadFile = File(...)):
 
         # Проверяем содержимое файла
         if not isinstance(data, list):
-            raise HTTPException(status_code=400, detail="Файл должен содержать список объектов.")
-        
+            raise HTTPException(
+                status_code=400,
+                detail="Файл должен содержать список объектов.")
+
         # Добавляем молекулы в наш контейнер
         for molecule in data:
             if "id" not in molecule or "smiles" not in molecule:
                 raise HTTPException(
-                    status_code=400, detail="Каждый объект должен содержать поля 'id' и 'smiles'."
-                )
+                    status_code=400,
+                    detail="Каждый объект должен содержать поля 'id' и 'smiles'.")
             if molecule["id"] in molecule_store:
                 raise HTTPException(
-                    status_code=400, detail=f"Молекула с ID {molecule['id']} уже существует."
-                )
+                    status_code=400, detail=f"Молекула с ID {
+                        molecule['id']} уже существует.")
             molecule_store[molecule["id"]] = molecule["smiles"]
 
         return {"message": "Молекулы успешно загружены.", "count": len(data)}
 
     except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Некорректный формат JSON.")
+        raise HTTPException(
+            status_code=400,
+            detail="Некорректный формат JSON.")
