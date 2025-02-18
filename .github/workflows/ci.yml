@@ -43,7 +43,7 @@ jobs:
         run: flake8 src --max-line-length=88
 
       - name: Run Tests
-        run: pytest src/tests
+        run: pytest src/tests.py
 
       - name: Stop Docker Containers
         run: docker-compose down
