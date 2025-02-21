@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 
 import sys
 import os
+import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -24,18 +25,28 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Создаем все таблицы в тестовой базе
-Base.metadata.create_all(bind=engine)
+# Фикстура для тестовой базы
+@pytest.fixture(scope="function", autouse=True)
+def setup_and_teardown():
+    Base.metadata.drop_all(bind=engine)  # Очистка базы
+    Base.metadata.create_all(bind=engine)  # Создание новой
+    yield
 
+@pytest.fixture()
+def db_session():
+    session = TestingSessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
-# Функция для переопределения зависимости get_db в тестах
+# Подменяем зависимость в FastAPI
 def override_get_db():
     db = TestingSessionLocal()
     try:
         yield db
     finally:
         db.close()
-
 
 app.dependency_overrides[get_db] = override_get_db
 
