@@ -49,6 +49,9 @@ jobs:
       - name: Debug List files
         run: ls -R
       
+      - name: Проверка работающих контейнеров
+        run: docker ps -a
+
       - name: Run Tests
         run: pytest tests
 
