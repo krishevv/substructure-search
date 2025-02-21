@@ -5,9 +5,13 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+import sys
+import os
 
-from database import Base, get_db
-from main import app
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from src.database import Base, get_db
+from src.main import app
 
 # Создаем in‑memory SQLite базу для тестов с использованием StaticPool
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
