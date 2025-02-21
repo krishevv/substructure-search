@@ -42,7 +42,13 @@ jobs:
 
       - name: Run Flake8 (Static Analysis)
         run: flake8 src --max-line-length=88
+      
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
 
+      - name: Debug List files
+        run: ls -R
+      
       - name: Run Tests
         run: pytest tests
 
