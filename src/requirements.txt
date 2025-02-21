@@ -2,3 +2,5 @@ fastapi
 uvicorn
 rdkit
 python-multipart
+sqlalchemy
+psycopg2

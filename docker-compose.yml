@@ -1,11 +1,29 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - webnet
   web1:
     build:
       context: ./src
     environment:
       SERVER_ID: SERVER-1
+      RUN_MIGRATIONS: "true" # web1 создаст таблицы
+    env_file:
+      - .env
+    depends_on:
+      - db
     networks:
       - webnet
 
@@ -14,6 +32,11 @@ services:
       context: ./src
     environment:
       SERVER_ID: SERVER-2
+      RUN_MIGRATIONS: "false"  # web2 не будет пытаться создавать таблицы
+    env_file:
+      - .env
+    depends_on:
+      - db
     networks:
       - webnet
 
@@ -28,6 +51,9 @@ services:
       - web2
     networks:
       - webnet
+
+volumes:
+  db_data:
 
 networks:
   webnet:
