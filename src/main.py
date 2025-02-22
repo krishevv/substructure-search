@@ -5,8 +5,8 @@ from rdkit import Chem
 import json
 import os
 
-from database import get_db, Base, engine
-from models import Molecule
+from .database import get_db, Base, engine
+from .models import Molecule
 from pydantic import BaseModel
 
 
