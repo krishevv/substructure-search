@@ -18,6 +18,7 @@ services:
     build:
       context: ./src
     environment:
+      PYTHONPATH: /app/src
       SERVER_ID: SERVER-1
       RUN_MIGRATIONS: "true" # web1 создаст таблицы
     env_file:
@@ -26,11 +27,13 @@ services:
       - db
     networks:
       - webnet
+      
 
   web2:
     build:
       context: ./src
     environment:
+      PYTHONPATH: /app/src
       SERVER_ID: SERVER-2
       RUN_MIGRATIONS: "false"  # web2 не будет пытаться создавать таблицы
     env_file:
@@ -57,3 +60,4 @@ volumes:
 
 networks:
   webnet:
+  

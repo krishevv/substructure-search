@@ -1,8 +1,8 @@
 FROM python:3.12
 
 # Устанавливаем рабочую директорию
-WORKDIR /app
-ENV PYTHONPATH="/app"
+WORKDIR /app/src
+ENV PYTHONPATH="/app/src"
 
 # Копируем файл с зависимостями
 COPY requirements.txt .

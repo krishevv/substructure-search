@@ -5,8 +5,13 @@ from rdkit import Chem
 import json
 import os
 
-from .database import get_db, Base, engine
-from .models import Molecule
+try:
+    from src.database import get_db, Base, engine
+    from src.models import Molecule
+except ModuleNotFoundError:
+    from database import get_db, Base, engine
+    from models import Molecule
+
 from pydantic import BaseModel
 
 

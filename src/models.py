@@ -1,5 +1,10 @@
 from sqlalchemy import Column, Integer, String
-from .database import Base
+
+try:
+    from src.database import Base
+except ModuleNotFoundError:
+    from database import Base
+
 
 
 class Molecule(Base):
