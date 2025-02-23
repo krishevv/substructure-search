@@ -6,7 +6,6 @@ except ModuleNotFoundError:
     from database import Base
 
 
-
 class Molecule(Base):
     __tablename__ = "molecules"
 

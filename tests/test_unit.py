@@ -1,19 +1,18 @@
-import json
-from io import BytesIO
-from fastapi.testclient import TestClient
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
+from src.database import Base, get_db
+from src.main import app
 
 import sys
 import os
+import json
+from io import BytesIO
+
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 import pytest
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from src.database import Base, get_db
-from src.main import app
 
 # Создаем in‑memory SQLite базу для тестов с использованием StaticPool
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -25,12 +24,14 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 # Фикстура для тестовой базы
 @pytest.fixture(scope="function", autouse=True)
 def setup_and_teardown():
     Base.metadata.drop_all(bind=engine)  # Очистка базы
     Base.metadata.create_all(bind=engine)  # Создание новой
     yield
+
 
 @pytest.fixture()
 def db_session():
@@ -40,6 +41,7 @@ def db_session():
     finally:
         session.close()
 
+
 # Подменяем зависимость в FastAPI
 def override_get_db():
     db = TestingSessionLocal()
@@ -47,6 +49,7 @@ def override_get_db():
         yield db
     finally:
         db.close()
+
 
 app.dependency_overrides[get_db] = override_get_db
 
