@@ -80,7 +80,7 @@ def test_update_molecule():
     update_response = client.put(f"/molecule/{mol_id}", json={"structure": "CCC"})
     assert update_response.status_code == 200
     update_data = update_response.json()
-    assert update_data.get("message") == "Молекула обновлена успешно."
+    assert update_data.get("message") == "Молекула обновлена успешно"
     assert update_data["id"] == mol_id
     get_response = client.get(f"/molecule/{mol_id}")
     get_data = get_response.json()

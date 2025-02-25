@@ -64,12 +64,12 @@ def get_molecule(id: int, db: Session = Depends(get_db)):
 def update_molecule(id: int, molecule: MoleculeUpdate, db: Session = Depends(get_db)):
     db_molecule = db.query(Molecule).filter(Molecule.id == id).first()
     if not db_molecule:
-        raise HTTPException(status_code=404, detail="Молекула не найдена.")
+        raise HTTPException(status_code=404, detail="Молекула не найдена")
     db_molecule.structure = molecule.structure
     db.commit()
     db.refresh(db_molecule)
 
-    return {"message": "Молекула обновлена успешно.", "id": db_molecule.id}
+    return {"message": "Молекула обновлена успешно", "id": db_molecule.id}
 
 
 @app.delete("/molecule/{id}")
@@ -115,7 +115,14 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
                                 detail="Только JSON-файлы поддерживаются.")
 
         file_content = await file.read()
-        data = json.loads(file_content.decode("utf-8"))
+
+        if not file_content:
+            raise HTTPException(status_code=400, detail="Файл пуст")
+
+        try:
+            data = json.loads(file_content.decode("utf-8"))
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Некорректный формат JSON.")
 
         if not isinstance(data, list):
             raise HTTPException(status_code=400,
@@ -140,5 +147,8 @@ async def upload_file(file: UploadFile = File(...), db: Session = Depends(get_db
         db.commit()
         return {"message": "Молекулы успешно загружены.", "count": len(data)}
 
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Некорректный формат JSON.")
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Внутренняя ошибка сервера {e}")

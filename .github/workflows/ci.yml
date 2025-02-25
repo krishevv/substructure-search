@@ -52,8 +52,11 @@ jobs:
       - name: Проверка работающих контейнеров
         run: docker ps -a
 
-      - name: Run Tests
-        run: pytest tests
+      - name: Run Unit Tests
+        run: pytest tests\test_unit.py
 
+      - name: Run Integration Tests
+        run: pytest tests\test_integration.py
+      
       - name: Stop Docker Containers
         run: docker-compose down
