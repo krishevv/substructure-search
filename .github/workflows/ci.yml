@@ -53,10 +53,10 @@ jobs:
         run: docker ps -a
 
       - name: Run Unit Tests
-        run: pytest tests\test_unit.py
+        run: pytest tests/test_unit.py
 
       - name: Run Integration Tests
-        run: pytest tests\test_integration.py
+        run: pytest tests/test_integration.py
       
       - name: Stop Docker Containers
         run: docker-compose down
